@@ -1,18 +1,26 @@
-import { Button, Card, Flex, Typography } from 'antd';
+import { Button, Card, Col, Flex, Grid, Row, Typography } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
-import { Controller, useForm } from 'react-hook-form';
-import { DatePicker, InputNumber, InputText, Select } from '../../components';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { DatePicker, InputNumber, InputText, Select, TimePicker } from '../../components';
+import MEDICATIONS from '../../constants/medications';
+import TREATMENTS from '../../constants/treatments';
 import './index.css';
 import { FormFieldTypes } from './types';
 
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const Home = () => {
-  const { control, watch, reset } = useForm<FormFieldTypes>({
+  const screen = useBreakpoint();
+  console.log(screen);
+
+  const { control, reset, handleSubmit } = useForm<FormFieldTypes>({
     mode: 'onChange',
   });
 
-  console.log(watch());
+  const onSubmit: SubmitHandler<FormFieldTypes> = (formData) => {
+    console.log(formData);
+  };
 
   return (
     <main>
@@ -20,7 +28,7 @@ const Home = () => {
         <Title level={3} className="center">
           Add Patient Data
         </Title>
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Flex gap={32} vertical>
             <Flex gap={16} vertical>
               <Controller
@@ -66,31 +74,58 @@ const Home = () => {
                   />
                 )}
               />
-              <Controller
-                control={control}
-                name="treatmentDate"
-                rules={{
-                  required: 'Please select the treatment date.',
-                }}
-                render={({ field, fieldState: { error } }) => {
-                  const value = (field.value ? dayjs(field.value, 'DD/MM/YYYY') : '') as Dayjs;
+              <Row>
+                <Col span={screen?.sm ? 15 : 13}>
+                  <Controller
+                    control={control}
+                    name="date"
+                    rules={{
+                      required: 'Please select the treatment date.',
+                    }}
+                    render={({ field, fieldState: { error } }) => {
+                      const value = (field.value ? dayjs(field.value, 'DD/MM/YYYY') : '') as Dayjs;
+                      return (
+                        <DatePicker
+                          {...field}
+                          value={value}
+                          onChange={(_, dateString) => field.onChange(dateString)}
+                          label="Treatment Date"
+                          placeholder={`Ex: ${dayjs().format('DD/MM/YYYY')}`}
+                          errorText={error?.message}
+                          size="large"
+                        />
+                      );
+                    }}
+                  />
+                </Col>
+                <Col span={screen?.sm ? 8 : 10} offset={1}>
+                  <Controller
+                    control={control}
+                    name="time"
+                    rules={{
+                      required: 'Please select the treatment time.',
+                    }}
+                    render={({ field, fieldState: { error } }) => {
+                      const value = (field.value ? dayjs(field.value, 'HH:mm:ss') : '') as Dayjs;
 
-                  return (
-                    <DatePicker
-                      {...field}
-                      value={value}
-                      onChange={(_, dateString) => field.onChange(dateString)}
-                      label="Treatment Date"
-                      placeholder="Select treatment date"
-                      errorText={error?.message}
-                      size="large"
-                    />
-                  );
-                }}
-              />
+                      return (
+                        <TimePicker
+                          {...field}
+                          value={value}
+                          onChange={(_, dateString) => field.onChange(dateString)}
+                          label="Treatment Time"
+                          placeholder={`Ex: ${dayjs().format('HH:mm:ss')}`}
+                          errorText={error?.message}
+                          size="large"
+                        />
+                      );
+                    }}
+                  />
+                </Col>
+              </Row>
               <Controller
                 control={control}
-                name="treatmentDescription"
+                name="treatment_description"
                 rules={{
                   required: 'Please select the treatment description.',
                 }}
@@ -103,30 +138,16 @@ const Home = () => {
                     label="Treatment Description"
                     placeholder="Select treatment description"
                     errorText={error?.message}
-                    options={[
-                      {
-                        value: 'one',
-                        label: 'One',
-                      },
-                      {
-                        value: 'two',
-                        label: 'Two',
-                      },
-                      {
-                        value: 'three',
-                        label: 'Three',
-                      },
-                      {
-                        value: 'four',
-                        label: 'Four',
-                      },
-                    ]}
+                    options={TREATMENTS.map((treatment) => ({
+                      value: treatment,
+                      label: treatment,
+                    }))}
                   />
                 )}
               />
               <Controller
                 control={control}
-                name="medicationsPrescribed"
+                name="medications_prescribed"
                 rules={{
                   required: 'Please select the medications prescribed.',
                 }}
@@ -139,24 +160,10 @@ const Home = () => {
                     label="Medications Prescribed"
                     placeholder="Select medications prescribed"
                     errorText={error?.message}
-                    options={[
-                      {
-                        value: 'one',
-                        label: 'One',
-                      },
-                      {
-                        value: 'two',
-                        label: 'Two',
-                      },
-                      {
-                        value: 'three',
-                        label: 'Three',
-                      },
-                      {
-                        value: 'four',
-                        label: 'Four',
-                      },
-                    ]}
+                    options={MEDICATIONS.map((medication) => ({
+                      value: medication,
+                      label: medication,
+                    }))}
                   />
                 )}
               />

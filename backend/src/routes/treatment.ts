@@ -1,9 +1,10 @@
+import TreatmentController from '@/controllers/treatment';
+import treatmentValidator from '@/middlewares/treatmentValidator';
 import express from 'express';
-import TreatmentController from '../controllers/treatment';
 
 const treatmentRouter = express.Router();
 
 treatmentRouter.get('/', TreatmentController.getAll);
-treatmentRouter.post('/', TreatmentController.create);
+treatmentRouter.post('/', treatmentValidator, TreatmentController.create);
 
 export default treatmentRouter;

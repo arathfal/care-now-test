@@ -31,3 +31,11 @@ input[type='number'] {
 .ant-input-number {
   width: 100%;
 }
+
+.center {
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}

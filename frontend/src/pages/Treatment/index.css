@@ -1,0 +1,14 @@
+#treatment {
+  padding: 2rem;
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+}
+
+#treatment > div {
+  width: 100%;
+}
+
+.space-bottom {
+  margin-bottom: 1rem;
+}

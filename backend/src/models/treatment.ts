@@ -1,4 +1,4 @@
-import db from '../firestore';
+import db from '@/configs/firestore';
 
 interface TreatmentData {
   documentId?: string;
@@ -15,6 +15,7 @@ interface TreatmentDataResponse extends Omit<TreatmentData, 'treatment_date'> {
     _seconds: number;
     _nanoseconds: number;
   };
+  created_at: string;
 }
 
 export default class TreatmentModel {
@@ -31,7 +32,7 @@ export default class TreatmentModel {
   static async find(): Promise<TreatmentModel[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        const snapshot = await db.collection('treatments').get();
+        const snapshot = await db.collection('treatments').orderBy('created_at', 'desc').get();
         const documents = snapshot.docs.map((doc) => {
           const data = doc.data() as TreatmentDataResponse;
           const id = data?.id;
@@ -53,8 +54,8 @@ export default class TreatmentModel {
           );
         });
         resolve(documents);
-      } catch (error) {
-        reject(error);
+      } catch (error: any) {
+        reject(error?.message);
       }
     });
   }
@@ -72,8 +73,8 @@ export default class TreatmentModel {
           created_at: new Date(),
         });
         resolve(docRef.id);
-      } catch (error) {
-        reject(error);
+      } catch (error: any) {
+        reject(error?.message);
       }
     });
   }

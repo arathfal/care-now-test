@@ -1,5 +1,5 @@
+import TreatmentModel from '@/models/treatment';
 import { Request, Response } from 'express';
-import TreatmentModel from '../models/treatment';
 
 export default class TreatmentController {
   static async getAll(_: Request, res: Response) {
@@ -7,15 +7,19 @@ export default class TreatmentController {
       // Get the list of treatment from the database
       const treatments = await TreatmentModel.find();
       res.json({
-        status: 'success',
+        success: true,
         data: treatments,
+        errors: null,
       });
     } catch (errors) {
       res.status(500).send({
-        status: 'error',
-        data: {
-          errors,
-        },
+        success: false,
+        data: null,
+        errors: [
+          {
+            message: errors,
+          },
+        ],
       });
     }
   }
@@ -41,17 +45,21 @@ export default class TreatmentController {
       const documentId = await treatment.save();
 
       res.status(201).send({
-        status: 'success',
+        success: true,
         data: {
           documentId,
         },
+        errors: null,
       });
     } catch (errors) {
       res.status(500).send({
-        status: 'error',
-        data: {
-          errors,
-        },
+        success: false,
+        data: null,
+        errors: [
+          {
+            message: errors,
+          },
+        ],
       });
     }
   }

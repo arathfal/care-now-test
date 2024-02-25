@@ -1,32 +1,79 @@
+import { DatePicker, InputNumber, InputText, Select, TimePicker } from '@/components';
+import MEDICATIONS from '@/constants/medications';
+import paths from '@/constants/paths';
+import TREATMENTS from '@/constants/treatments';
+import usePost from '@/hooks/usePost';
+import useToast from '@/hooks/useToast';
+import { ApiResponse } from '@/types/commonApi';
 import { Button, Card, Col, Flex, Grid, Row, Typography } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { DatePicker, InputNumber, InputText, Select, TimePicker } from '../../components';
-import MEDICATIONS from '../../constants/medications';
-import TREATMENTS from '../../constants/treatments';
+import { useNavigate } from 'react-router-dom';
 import './index.css';
-import { FormFieldTypes } from './types';
+import { CreateTreatmentResponse, FormFieldTypes } from './types';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
-const Home = () => {
+const TreatmentCreate = () => {
+  const navigate = useNavigate();
   const screen = useBreakpoint();
-  console.log(screen);
+  const { setNotif, contextHolder } = useToast();
 
-  const { control, reset, handleSubmit } = useForm<FormFieldTypes>({
+  const { control, handleSubmit } = useForm<FormFieldTypes>({
     mode: 'onChange',
   });
 
-  const onSubmit: SubmitHandler<FormFieldTypes> = (formData) => {
-    console.log(formData);
+  const [onPost, { loading }] = usePost<CreateTreatmentResponse>({
+    path: 'treatment',
+    onCompleted: (res) => {
+      const documentId = res?.documentId;
+      setNotif({
+        title: 'Create Treatment Success',
+        description: (
+          <span>
+            Treatment created successfully by id: <strong>{documentId}</strong>
+          </span>
+        ),
+      });
+      setTimeout(() => navigate(paths.TREATMENT), 300);
+    },
+    onError: (err) => {
+      const errors = err as ApiResponse['errors'];
+      setNotif({
+        type: 'error',
+        title: 'Create Treatment Failed',
+        description: (
+          <>
+            <Text>There are some error on your input:</Text>
+            <ul>
+              {errors?.map((e, i) => {
+                return (
+                  <li key={i.toString() + e}>
+                    <Text type="danger">{e?.message}</Text>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        ),
+      });
+    },
+  });
+
+  const onSubmit: SubmitHandler<FormFieldTypes> = async (formData) => {
+    await onPost({
+      ...formData,
+      date: dayjs(formData?.date, 'DD/MM/YYYY').format('YYYY/MM/DD'),
+    });
   };
 
   return (
-    <main>
+    <main id="treatment-create">
+      {contextHolder}
       <Card>
         <Title level={3} className="center">
-          Add Patient Data
+          Add Treatment Data
         </Title>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex gap={32} vertical>
@@ -132,7 +179,7 @@ const Home = () => {
                 render={({ field, fieldState: { error } }) => (
                   <Select
                     {...field}
-                    mode="multiple"
+                    mode="tags"
                     size="large"
                     allowClear
                     label="Treatment Description"
@@ -190,11 +237,22 @@ const Home = () => {
               />
             </Flex>
             <Flex gap={16}>
-              <Button type="primary" htmlType="submit" className="full-width" size="large">
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="full-width"
+                size="large"
+                loading={loading}
+              >
                 Submit
               </Button>
-              <Button htmlType="button" onClick={() => reset()} className="full-width" size="large">
-                Reset
+              <Button
+                htmlType="button"
+                onClick={() => navigate(paths.TREATMENT)}
+                className="full-width"
+                size="large"
+              >
+                Cancel
               </Button>
             </Flex>
           </Flex>
@@ -203,4 +261,4 @@ const Home = () => {
     </main>
   );
 };
-export default Home;
+export default TreatmentCreate;

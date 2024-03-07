@@ -78,4 +78,15 @@ export default class TreatmentModel {
       }
     });
   }
+
+  static async delete(id: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await db.collection('treatments').doc(id).delete();
+        resolve();
+      } catch (error: any) {
+        reject(error?.message);
+      }
+    });
+  }
 }

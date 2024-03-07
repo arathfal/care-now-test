@@ -20,4 +20,5 @@ export type DataTableType = {
   treatmentDescriptions: string[];
   medicationsPrescribeds: string[];
   cost: number;
+  documentId: string;
 };

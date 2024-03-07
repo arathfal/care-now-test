@@ -63,4 +63,29 @@ export default class TreatmentController {
       });
     }
   }
+
+  static async delete(req: Request, res: Response) {
+    try {
+      const documentId = req?.params?.id;
+      await TreatmentModel.delete(documentId);
+
+      res.status(200).send({
+        success: true,
+        data: {
+          documentId,
+        },
+        errors: null,
+      });
+    } catch (errors) {
+      res.status(500).send({
+        success: false,
+        data: null,
+        errors: [
+          {
+            message: errors,
+          },
+        ],
+      });
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import { FetchOptions, FetchResponse } from '@/types/commonApi';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-const useGet = <Data>({
+const useDelete = <Data>({
   path,
   onCompleted,
   onError,
@@ -13,10 +13,10 @@ const useGet = <Data>({
   const [error, setError] = useState<FetchResponse<Data>['error'] | unknown>(null);
   const [data, setData] = useState<FetchResponse<Data>['data']>(null);
 
-  const get = async () => {
+  const deleteData = async () => {
     setLoading(true);
     const requestOptions = {
-      method: 'GET',
+      method: 'DELETE',
       headers,
     };
 
@@ -37,12 +37,7 @@ const useGet = <Data>({
     }
   };
 
-  useEffect(() => {
-    get();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return [get, { loading, data, error }];
+  return [deleteData, { loading, data, error }];
 };
 
-export default useGet;
+export default useDelete;
